@@ -20,12 +20,12 @@ For execution the script needs Python 3 (was tested on v.3.8) interpretator and 
 * `stem`  — The common name part for directories with the results of calculations. Default is `traj_`;
 
 **Parameters:**
-* `--fraction N` — Ratio of STD value to its average. Used for calculation of t<sub>cut</sub>. Default is 0.4;
+* `--fraction N` — Threshold value for STD to average ratio. Used for calculation of t<sub>cut</sub>. Default is 0.4;
 *	`--amount AMOUNT` — Number of directories used for analysis. If lesser than 0 or greater than number of available directories, all directories will be used. Default is 0;
 * `--oa AVE_NAME` — File name for saving the averaged viscosity time dependence [ps, P]. If not set this data will not be saved;
 *	`--os STD_NAME` — File name for saving the viscosity STD time dependence [ps, P]. If not set this data will not be saved;
 * `--of FIT_NAME` — File name for saving the fitted viscosity time dependence [ps, P]. If not set this data will not be saved;
-* `-h`, `--help` — Usage help.
+* `-h`, `--help` — shows this help message and exit.
 
 After successful execution the script will print the shear viscosity rate in poises [P]. 
  
