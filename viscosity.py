@@ -175,43 +175,48 @@ if __name__ == "__main__":
     start_time = datetime.now()
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", 
-                        help="Project directory. Default is current directory", 
+                        help=("The name of project directory. Default is "
+                              "current directory"), 
                         nargs="?",
                         default=".")
     parser.add_argument("stem", 
-                        help=("Common part of the simulation " 
-                        "directories names. Default is traj_"),
+                        help=("The common name part for directories "
+                              "with the results of calculations. " 
+                              "Default is traj_"),
                         nargs="?",
                         default="traj_"
                         )
     parser.add_argument("--fraction", 
                         help=("Threshold value for STD to average ratio. "
-                        "Default 0.4"),
+                              "Used for calculation of t_cut."
+                              "Default 0.4"),
                         default=0.4,
                         type=float
                         )
     parser.add_argument("--amount", 
-                        help=("Amount of the simulation directories "
-                        " for analysis. Default is all."),
+                        help=("Number of directories used for analysis. "
+                              "If lesser than 0 or greater than number "
+                              "of available directories, all directories "
+                              "will be used. Default is 0"),
                         default=0,
                         type=int
                         )
     parser.add_argument("--oa", 
-                        help=("File name for averaged viscosity time " 
-                        "dependence [ps], [P]. If not set data will " 
-                        "not be saved"),
+                        help=("File name for saving the averaged viscosity "
+                              "time dependence [ps, P]. If not set this data "
+                              "will not be saved."), 
                         metavar="NAME",
                         )
     parser.add_argument("--os", 
-                        help=("File name for viscosity STD time " 
-                        "dependence [ps], [P]. If not set data will " 
-                        "not be saved"),
+                        help=("File name for saving the viscosity STD time "
+                              "dependence [ps, P]. If not set this data "
+                              "will not be saved."),
                         metavar="NAME",
                         )
     parser.add_argument("--of", 
-                        help=("File name for fitted viscosity time " 
-                        "dependence [ps], [P]. If not set data will " 
-                        "not be saved"),
+                        help=("File name for saving the fitted viscosity "
+                              "time dependence [ps, P]. If not set this "
+                              "data will not be saved."),
                         metavar="NAME",
                         )
     args = parser.parse_args()
