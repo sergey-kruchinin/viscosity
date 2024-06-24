@@ -1,47 +1,47 @@
 # run_green_cubo.sbatch
-**Использование.**
-Запуск осуществляется командой `sbatch run_green_cubo.sbatch`. Это обычный скрипт для одновременного запуска нескольких задач с общими параметрами для SLURM (запуск в режиме массива). Для работы скрипта требуется начальная директория с необходимыми для запуска МД расчетов файлами. Скрипт копирует эту директорию нужное количество раз и для каждой из них ставит в очередь на выполнение заданную последовательность команд для моделирования.
+**Usage.**
+Run as `sbatch run_green_cubo.sbatch`. It is a simple script for SLURM for simultaneous submitting of several tasks with common parameters (job array). It submits a given number of MD simulations for creating a hierarchical structure of directories and files needed for running script `viscosity.py`. The script needs a start directory with necessary files for MD calculations. This directory will be copied by the script the required number of times and a job with given commands will be submitted for every created directory.
 
-**Настройка поведения.**
-*	Входная директория задается в скрипте переменной `INIT_DIR` (по умолчанию директория `init` в той же директории, где и сам скрипт);
-*	Количество копий задается в скрипте как SBATCH переменная `--array=N-M` (N – начальный индекс задачи, М – конечный индекс задачи);
-*	Имя директорий для запускаемых задач состоит из двух частей: имени – задается в скрипте переменной `WORK_DIR` (по умолчанию `traj_`) и индекса – берется из значений переменной `--array` (см. выше);
-*	Желаемое количество CPU, GPU и иных ресурсов задается обычным для SBATCH скриптов способом. Указываемое количество ресурсов – это количество, запрашиваемое на одну задачу;
-*	Последовательность команд для выполнения перечислена в конце скрипта.
+**Setup**
+*	The start directory name is set in the script by variable `INIT_DIR` (default is `init` in the same directory with the script);
+*	Number of copies is set as SBATCH variable `--array=N-M` (N – minimal job index, М – maximal job index);
+*	The directories names for submitting jobs are constructed from two parts: first - name, which is set in the script by variable `WORK_DIR` (default is `traj_`) and second - index, which is taken from values of SBATCH variable `--array` (see before);
+*	Desireable amount of CPU, GPU and another computational resources is set by common way for a SBATCH scripts. The indicated amount of computational resources is the amount for the one job;
+*	The command sequence for running is written in the end of the script.
 
-Результатом успешного выполнения скрипта будут (M-N) директорий с данными расчетов. 
+After successful script execution the (M-N) directories with the calculations data will be created. 
 
 # viscosity.py
-**Использование.**
-Для запуска необходим интерпретатор Python 3 (использовалась версия 3.8) и установленные библиотеки NumPy (при написании использовалась версия 1.21.5) и SciPy (при написании использовалась версия 1.7.3). Данный скрипт вычисляет из набора автокорреляционных функций компонентов тензора давления значение вязкости по алгоритму из статьи [^Zhang2015]. Для корректной работы иерархическая структура входных данных должна быть сформирована скриптом `run_green_cubo.sbatch` или аналогичным ему. 
+**Usage.**
+For execution the script needs Python 3 (was tested on v.3.8) interpretator and NumPy (was tested on v.1.21.5) and SciPy(was tested on v.1.7.3) libraries. The script calculates the shear viscosity rate from the set of autocorrelation functions of the pressure tensor components by the algorithm from the paper [^Zhang2015]. For correct work the hierarchical structure of the input data must be created by the script  `run_green_cubo.sbatch` or analogous. 
 
 `viscosity.py [-h] [--fraction FRACTION] [--amount AMOUNT] [--oa AVE_NAME] [--os STD_NAME] [--of FIT_NAME] [directory] [stem]`
-* `directory` — Имя директории с директориями расчетов. По умолчанию это текущая директория;
-* `stem`  — Общая часть имени для директорий с результатами расчетов. По умолчанию это `traj_`;
+* `directory` — The name of directory with the results of calculations. Default is current directory;
+* `stem`  — The common name part for directories with the results of calculations. Default is `traj_`;
 
-**Параметры:**
-* `--fraction N` — Отношение величины STD вязкости к её среднему значению для расчета t<sub>cut</sub>. По умолчанию 0.4;
-*	`--amount AMOUNT` — Количество директорий с результатами расчетов для обработки. Если значение больше 0 или превышает количество доступных директорий, берутся все доступные директории. По умолчанию 0;
-* `--oa AVE_NAME` — Имя файла для сохранения усредненной зависимости вязкости от времени моделирования [пс], [П]. Если не задана, данные сохраняться не будут;
-*	`--os STD_NAME` — Имя файла для сохранения величины STD вязкости от времени моделирования [пс], [П]. Если не задана, данные сохраняться не будут;
-* `--of FIT_NAME` — Имя файла для сохранения приближенной («отфитированной») зависимости вязкости от времени моделирования [пс], [П]. Если не задана, данные сохраняться не будут;
-* `-h`, `--help` — помощь по использованию.
+**Parameters:**
+* `--fraction N` — Ratio of STD value to its average. Using for calculation t<sub>cut</sub>. Default is 0.4;
+*	`--amount AMOUNT` — Number of directories using for analysis. If lesser than 0 or greater than number of available directories, all directories will be taken. Default is 0;
+* `--oa AVE_NAME` — File name for saving the averaged viscosity time dependence [ps, P]. If not set this data will not be saved;
+*	`--os STD_NAME` — File name for saving the viscosity STD time dependence [ps, P]. If not set this data will not be saved;
+* `--of FIT_NAME` — File name for saving the fitted viscosity time dependence [ps, P]. If not set this data will not be saved;
+* `-h`, `--help` — Usage help.
 
-После успешного выполнения скрипт выведет полученное значение вязкости в пуазах [П] и дополнительные параметры и характеристики произведенных приближений.
+After successful execution the script will print the shear viscosity rate in poises [P]. 
  
 # run_nemd.sbatch
-**Использование.**
-Запуск осуществляется командой `sbatch run_nemd.sbatch`. Как и скрипт `run_green_cubo.sbatch`, это скрипт для одновременного запуска нескольких задач с общими параметрами для SLURM (запуск в режиме массива). Его отличием является двухэтапный запуск задач, обусловленный алгоритмом расчета сдвиговой вязкости методом пространственно осциллирующих возмущений (spatially oscillating perturbations). На первом этапе проводится N моделирований с одинаковыми параметрами расчета. На втором этапе для каждого из N моделирований проводится M моделирований с различным значением ускорения (параметр `cos-acceleration`), накладываемого на частицы системы [^AllenCSL]. Это достигается созданием отдельных `.sbatch` файлов, которые запускают расчет с каждым значением ускорения. Результатом является N×M значений вязкости, использующиеся для дальнейшей обработки. Для работы скрипта требуется директория с необходимыми файлами для запуска МД расчетов. Скрипт копирует эту директорию нужное количество раз и для каждой из них ставит в очередь на выполнение заданную последовательность команд для моделирования.
+**Usage.**
+Run as `sbatch run_nemd.sbatch`. It is a script for SLURM for simultaneous submitting of several jobs with common parameters (job array). It submits a given number of MD simulations for calculating shear viscosity rate by spatially oscillating perturbations method. At first stage the script submits N simulations with the same modelling parameters. At second stage the script creates additional `.sbatch` files which submits a simulations with different values of `cos-acceleration` parameter (acceleration of system particles) [^AllenCSL] for every simulation from first stage. The script needs a directory with necessary files for running MD simulations. This directory will be copied by the script the required number of times and a job with given commands will be submitted for every created directory.
 
-**Настройка поведения.**
-* Входная директория задается в скрипте переменной `INIT_DIR` (по умолчанию директория `init` в той же директории, где и сам скрипт);
-* Количество копий задается в скрипте как SBATCH переменная `--array=N-M` (N – начальный индекс задачи, М – конечный индекс задачи);
-*	Имя директорий для запускаемых задач состоит из двух частей: имени – задается в скрипте переменной `WORK_DIR` (по умолчанию `traj_`) и индекса – берется из значений переменной `--array` (см. выше);
-* Желаемые значения ускорений перечисляются в переменной `ACCELERATIONS`;
-* Имя логин-сервера указывается в `LOGIN_SERVER`. Оно необходимо для выполнения второго этапа расчетов;
-* Желаемое количество CPU, GPU и иных ресурсов задается обычным для SBATCH скриптов способом. Указываемое количество ресурсов – это количество, запрашиваемое на одну задачу.
+**Setup**
+* The input directory is set in the script by the variable `INIT_DIR` (Default is `init` in the same directory with the script);
+* Number of copies for first stage is set as SBATCH variable `--array=N-M` (N – minimal job index, М – maximal job index);
+*	The directories names for the running tasks are constructed from two parts: first - name, which is set in the script by variable `WORK_DIR` (default is `traj_`) and second - index, which is taken from values of SBATCH variable `--array` (see before);
+* The `cos-acceleration` values is set in the variable `ACCELERATIONS`;
+* The name of the server which used for submitting jobs is set in the variable `LOGIN_SERVER`. It is needed for running second stage of calculation;
+* The desireable amount of CPU, GPU and another computational resources is set by common way for a SBATCH scripts. The indicated amount of computational resources is the amount for the one job.
 
-Результатом успешного выполнения скрипта будут (M-N) директорий в каждой из которых будут файлы со значениями вязкости для каждого из заданных ускорений.
+After successful script execution the (M-N) directories with the files containing shear rate viscosities for every given acceleration will be created.
 
 [^Zhang2015]: Y. Zhang, A. Otani, E.J. Maginn, Reliable Viscosity Calculation from Equilibrium Molecular Dynamics Simulations: A Time Decomposition Method, J. Chem. Theory Comput. 11 (2015) 3537–3546. https://doi.org/10.1021/acs.jctc.5b00351.
 
