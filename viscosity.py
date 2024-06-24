@@ -189,7 +189,7 @@ if __name__ == "__main__":
     parser.add_argument("--fraction", 
                         help=("Threshold value for STD to average ratio. "
                               "Used for calculation of t_cut."
-                              "Default 0.4"),
+                              "Default is 0.4"),
                         default=0.4,
                         type=float
                         )
