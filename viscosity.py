@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 import numpy as np
-from scipy import integrate
+from scipy.integrate import cumulative_trapezoid
 from scipy.optimize import curve_fit
 from datetime import datetime
 
@@ -164,7 +164,7 @@ def use_green_kubo(acf, temperature, volume):
     """
     k_Boltzmann = 1.380649e-23
     unit_conversion_coefficient = 1e-28
-    running_integral = integrate.cumtrapz(acf[:, 1], acf[:, 0])
+    running_integral = cumulative_trapezoid(acf[:, 1], acf[:, 0])
     viscosity = (unit_conversion_coefficient * running_integral 
                  * volume / (k_Boltzmann * temperature))
     out = np.column_stack((acf[1:, 0], viscosity))
